@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.23-linux:
     name: builder
     namespace: stolostron
@@ -76,7 +76,7 @@ images:
   to: grafana-dashboard-loader
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.17'
     namespace: stolostron
 resources:
   '*':
@@ -85,7 +85,7 @@ resources:
     requests:
       cpu: 100m
       memory: 1Gi
-test_binary_build_commands: "true"
+test_binary_build_commands: 'true'
 tests:
 - as: ocm-ci-rbac
   steps:
@@ -131,9 +131,11 @@ tests:
       REGISTRY_ORG: stolostron
     workflow: ocm-ci-image-mirror
 - as: test-unit
-  commands: |
-    export SELF="make"
+  commands: 'export SELF="make"
+
     VERBOSE="-v" make unit-tests
+
+    '
   container:
     from: src
   skip_if_only_changed: ^(?:docs|\.github|\.tekton)|\.md$|^(?:\.gitignore|.golang-ci.yml|OWNERS|LICENSE)$
@@ -149,16 +151,25 @@ tests:
     - ref: ocm-e2e-kind-create
     test:
     - as: test
-      commands: |
-        echo "MULTICLUSTER_OBSERVABILITY_OPERATOR_IMAGE_REF=$MULTICLUSTER_OBSERVABILITY_OPERATOR_IMAGE_REF"
+      commands: 'echo "MULTICLUSTER_OBSERVABILITY_OPERATOR_IMAGE_REF=$MULTICLUSTER_OBSERVABILITY_OPERATOR_IMAGE_REF"
+
         echo "ENDPOINT_MONITORING_OPERATOR_IMAGE_REF=$ENDPOINT_MONITORING_OPERATOR_IMAGE_REF"
+
         echo "GRAFANA_DASHBOARD_LOADER_IMAGE_REF=$GRAFANA_DASHBOARD_LOADER_IMAGE_REF"
+
         echo "METRICS_COLLECTOR_IMAGE_REF=$METRICS_COLLECTOR_IMAGE_REF"
+
         echo "RBAC_QUERY_PROXY_IMAGE_REF=$RBAC_QUERY_PROXY_IMAGE_REF"
+
         export SELF="make"
+
         set -o pipefail
+
         make e2e-tests-in-kind 2>&1 | tee ${ARTIFACT_DIR}/run-e2e-in-kind.log
+
         set +o pipefail
+
+        '
       dependencies:
       - env: MULTICLUSTER_OBSERVABILITY_OPERATOR_IMAGE_REF
         name: multicluster-observability-operator
@@ -183,40 +194,64 @@ tests:
     dependencies:
       COMPONENT_IMAGE_REF: multicluster-observability-operator
     env:
-      ACM_RELEASE_VERSION: release-2.16
+      ACM_RELEASE_VERSION: release-2.17
       CLUSTERPOOL_GROUP_NAME: Core-Services
       CLUSTERPOOL_HOST_NAMESPACE: acm-observability-usa
       CLUSTERPOOL_HOST_PROW_KUBE_SECRET: ocm-obs-usa-clusterpool
       CLUSTERPOOL_HUB_FILTER: sno-4xlarge-420
       CLUSTERPOOL_LIFETIME: 1h
-      CLUSTERPOOL_MANAGED_COUNT: "1"
+      CLUSTERPOOL_MANAGED_COUNT: '1'
       CLUSTERPOOL_MANAGED_FILTER: sno-420
       COMPONENT_NAME: multicluster-observability-operator
-      DEPLOY_HUB_ADDITIONAL_YAML: |
-        LS0tCmFwaVZlcnNpb246IHJiYWMuYXV0aG9yaXphdGlvbi5rOHMuaW8vdjEKa2luZDogQ2x1c3Rl
+      DEPLOY_HUB_ADDITIONAL_YAML: 'LS0tCmFwaVZlcnNpb246IHJiYWMuYXV0aG9yaXphdGlvbi5rOHMuaW8vdjEKa2luZDogQ2x1c3Rl
+
         clJvbGUKbWV0YWRhdGE6CiAgY3JlYXRpb25UaW1lc3RhbXA6IG51bGwKICBuYW1lOiBtdWx0aWNs
+
         dXN0ZXItb2JzZXJ2YWJpbGl0eS1vcGVyYXRvci1lMmUtdGVzdGluZwpydWxlczoKICAtIGFwaUdy
+
         b3VwczoKICAgIC0gYWRtaXNzaW9ucmVnaXN0cmF0aW9uLms4cy5pbwogICAgcmVzb3VyY2VzOgog
+
         ICAgLSBtdXRhdGluZ3dlYmhvb2tjb25maWd1cmF0aW9ucwogICAgLSB2YWxpZGF0aW5nd2ViaG9v
+
         a2NvbmZpZ3VyYXRpb25zCiAgICB2ZXJiczoKICAgIC0gY3JlYXRlCiAgICAtIGRlbGV0ZQogICAg
+
         LSBnZXQKICAgIC0gbGlzdAogICAgLSBwYXRjaAogICAgLSB1cGRhdGUKICAgIC0gd2F0Y2gKICAt
+
         IHZlcmJzOgogICAgLSAnKicKICAgIGFwaUdyb3VwczoKICAgIC0gJ21vbml0b3JpbmcuY29yZW9z
+
         LmNvbScKICAgIHJlc291cmNlczoKICAgIC0gcHJvbWV0aGV1c3J1bGVzCiAgLSB2ZXJiczoKICAg
+
         IC0gJyonCiAgICBhcGlHcm91cHM6CiAgICAtICdvYXV0aC5vcGVuc2hpZnQuaW8nCiAgICByZXNv
+
         dXJjZXM6CiAgICAtIG9hdXRoY2xpZW50cwogIC0gdmVyYnM6CiAgICAtICcqJwogICAgYXBpR3Jv
+
         dXBzOgogICAgLSAnYWRkb24ub3Blbi1jbHVzdGVyLW1hbmFnZW1lbnQuaW8nCiAgICByZXNvdXJj
+
         ZXM6CiAgICAtIGFkZG9uZGVwbG95bWVudGNvbmZpZ3MKICAtIGFwaUdyb3VwczoKICAgIC0gYWRk
+
         b24ub3Blbi1jbHVzdGVyLW1hbmFnZW1lbnQuaW8KICAgIHJlc291cmNlczoKICAgIC0gbWFuYWdl
+
         ZGNsdXN0ZXJhZGRvbnMKICAgIC0gbWFuYWdlZGNsdXN0ZXJhZGRvbnMvc3RhdHVzCiAgICAtIG1h
+
         bmFnZWRjbHVzdGVyYWRkb25zL2ZpbmFsaXplcnMKICAgIHZlcmJzOgogICAgLSB3YXRjaAogICAg
+
         LSBjcmVhdGUKICAgIC0gdXBkYXRlCiAgICAtIGRlbGV0ZQogICAgLSBnZXQKICAgIC0gbGlzdAog
+
         ICAgLSBwYXRjaAotLS0Ka2luZDogQ2x1c3RlclJvbGVCaW5kaW5nCmFwaVZlcnNpb246IHJiYWMu
+
         YXV0aG9yaXphdGlvbi5rOHMuaW8vdjEKbWV0YWRhdGE6CiAgbmFtZTogbXVsdGljbHVzdGVyLW9i
+
         c2VydmFiaWxpdHktb3BlcmF0b3ItZTJlLXRlc3RpbmcKcm9sZVJlZjoKICBhcGlHcm91cDogcmJh
+
         Yy5hdXRob3JpemF0aW9uLms4cy5pbwogIGtpbmQ6IENsdXN0ZXJSb2xlCiAgbmFtZTogbXVsdGlj
+
         bHVzdGVyLW9ic2VydmFiaWxpdHktb3BlcmF0b3ItZTJlLXRlc3RpbmcKc3ViamVjdHM6Ci0ga2lu
+
         ZDogU2VydmljZUFjY291bnQKICBuYW1lOiBtdWx0aWNsdXN0ZXItb2JzZXJ2YWJpbGl0eS1vcGVy
+
         YXRvcgogIG5hbWVzcGFjZTogb3Blbi1jbHVzdGVyLW1hbmFnZW1lbnQKLS0tCg==
+
+        '
       PIPELINE_STAGE: dev
     post:
     - as: obs-must-gather
@@ -232,16 +267,26 @@ tests:
       timeout: 20m0s
     test:
     - as: e2e
-      commands: |
-        KUBECONFIG=${SHARED_DIR}/hub-1.kc oc cm attach cluster --cluster managed --cluster-kubeconfig ${SHARED_DIR}/managed-1.kc
+      commands: 'KUBECONFIG=${SHARED_DIR}/hub-1.kc oc cm attach cluster --cluster
+        managed --cluster-kubeconfig ${SHARED_DIR}/managed-1.kc
+
         echo "ENDPOINT_MONITORING_OPERATOR_IMAGE_REF=$ENDPOINT_MONITORING_OPERATOR_IMAGE_REF"
+
         echo "GRAFANA_DASHBOARD_LOADER_IMAGE_REF=$GRAFANA_DASHBOARD_LOADER_IMAGE_REF"
+
         echo "METRICS_COLLECTOR_IMAGE_REF=$METRICS_COLLECTOR_IMAGE_REF"
+
         echo "RBAC_QUERY_PROXY_IMAGE_REF=$RBAC_QUERY_PROXY_IMAGE_REF"
+
         export SELF="make"
+
         set -o pipefail
+
         make e2e-tests 2>&1 | tee ${ARTIFACT_DIR}/e2e_tests_out.log
+
         set +o pipefail
+
+        '
       dependencies:
       - env: ENDPOINT_MONITORING_OPERATOR_IMAGE_REF
         name: endpoint-monitoring-operator
@@ -261,7 +306,7 @@ tests:
   postsubmit: true
   steps:
     env:
-      DESTINATION_BRANCH: release-2.16
+      DESTINATION_BRANCH: release-2.17
     workflow: ocm-ci-fastforward
 zz_generated_metadata:
   branch: main

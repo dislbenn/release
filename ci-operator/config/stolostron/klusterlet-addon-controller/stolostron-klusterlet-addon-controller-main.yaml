@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.25-linux:
     name: builder
     namespace: stolostron
@@ -24,17 +24,17 @@ images:
 promotion:
   to:
   - disabled: true
-    name: "2.16"
+    name: '2.17'
     namespace: stolostron
 releases:
   initial:
     integration:
-      name: "4.10"
+      name: '4.10'
       namespace: ocp
   latest:
     integration:
       include_built_images: true
-      name: "4.10"
+      name: '4.10'
       namespace: ocp
 resources:
   '*':
@@ -55,24 +55,34 @@ tests:
     from: src
   skip_if_only_changed: ^\.tekton/|\.rhtap$|^docs/|\.md$|^(?:.*/)?(?:\.gitignore|OWNERS|PROJECT|LICENSE)$
 - as: sonar-pre-submit
-  commands: |
-    export XDG_CACHE_HOME="/tmp"
+  commands: 'export XDG_CACHE_HOME="/tmp"
+
     export XDG_CONFIG_HOME="/tmp/xdg_config"
+
     export SONAR_GO_TEST_ARGS="./..."
+
     export SELF="make -f /opt/build-harness/Makefile.prow"
+
     make -f /opt/build-harness/Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   secrets:
   - mount_path: /etc/sonarcloud/
     name: acm-sonarcloud-token
 - as: sonar-post-submit
-  commands: |
-    export XDG_CACHE_HOME="/tmp"
+  commands: 'export XDG_CACHE_HOME="/tmp"
+
     export XDG_CONFIG_HOME="/tmp/xdg_config"
+
     export SONAR_GO_TEST_ARGS="./..."
+
     export SELF="make -f /opt/build-harness/Makefile.prow"
+
     make -f /opt/build-harness/Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   postsubmit: true
@@ -101,7 +111,7 @@ tests:
   postsubmit: true
   steps:
     env:
-      DESTINATION_BRANCH: release-2.16
+      DESTINATION_BRANCH: release-2.17
     workflow: ocm-ci-fastforward
 zz_generated_metadata:
   branch: main

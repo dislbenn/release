@@ -17,7 +17,7 @@ images:
   to: observatorium
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.17'
     namespace: stolostron
 resources:
   '*':
@@ -26,16 +26,18 @@ resources:
     requests:
       cpu: 100m
       memory: 1Gi
-test_binary_build_commands: "true"
+test_binary_build_commands: 'true'
 tests:
 - as: lint
-  commands: |
-    GOLANGCI_LINT_CACHE=/tmp/golangci-cache make lint --always-make
+  commands: 'GOLANGCI_LINT_CACHE=/tmp/golangci-cache make lint --always-make
+
+    '
   container:
     from: src
 - as: test
-  commands: |
-    make test --always-make
+  commands: 'make test --always-make
+
+    '
   container:
     from: test-bin
   skip_if_only_changed: ^(?:docs|\.github|\.tekton)|\.md$|^(?:\.gitignore|.golang-ci.yml|OWNERS|LICENSE)$
@@ -51,7 +53,7 @@ tests:
   postsubmit: true
   steps:
     env:
-      DESTINATION_BRANCH: release-2.16
+      DESTINATION_BRANCH: release-2.17
     workflow: ocm-ci-fastforward
 zz_generated_metadata:
   branch: main

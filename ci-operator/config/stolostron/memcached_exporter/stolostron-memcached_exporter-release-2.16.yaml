@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.24-linux:
     name: builder
     namespace: stolostron
@@ -22,8 +22,9 @@ images:
   to: memcached-exporter
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.16'
     namespace: stolostron
+    disabled: false
 resources:
   '*':
     limits:
@@ -31,7 +32,7 @@ resources:
     requests:
       cpu: 100m
       memory: 1Gi
-test_binary_build_commands: "true"
+test_binary_build_commands: 'true'
 tests:
 - as: pr-image-mirror
   steps:
@@ -51,13 +52,15 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export SELF="make -f /opt/build-harness/Makefile.prow"
+      commands: 'export SELF="make -f /opt/build-harness/Makefile.prow"
+
         export OSCI_PUBLISH_DELAY="0"
+
         export OSCI_COMPONENT_NAME="memcached-exporter"
-        make -f /opt/build-harness/Makefile.prow osci/publish
+
+        make -f /opt/build-harness/Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

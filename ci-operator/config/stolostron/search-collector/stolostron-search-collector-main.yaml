@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.24-linux:
     name: builder
     namespace: stolostron
@@ -23,7 +23,7 @@ images:
   to: search-collector
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.17'
     namespace: stolostron
 resources:
   '*':
@@ -51,12 +51,17 @@ tests:
     - ref: ocm-e2e-kind-create
     test:
     - as: e2e
-      commands: |
-        echo "COMPONENT_IMAGE_REF=$COMPONENT_IMAGE_REF"
+      commands: 'echo "COMPONENT_IMAGE_REF=$COMPONENT_IMAGE_REF"
+
         export SELF="make -f Makefile.prow"
+
         set -o pipefail
+
         make -f Makefile.prow test-e2e
+
         set +o pipefail
+
+        '
       dependencies:
       - env: COMPONENT_IMAGE_REF
         name: search-collector
@@ -70,36 +75,47 @@ tests:
   postsubmit: true
   steps:
     env:
-      DESTINATION_BRANCH: release-2.16
+      DESTINATION_BRANCH: release-2.17
     workflow: ocm-ci-fastforward
 - as: lint
-  commands: |
-    GOLANGCI_LINT_CACHE=/tmp/golangci-cache make -f Makefile.prow lint
+  commands: 'GOLANGCI_LINT_CACHE=/tmp/golangci-cache make -f Makefile.prow lint
+
+    '
   container:
     from: src
 - as: test-unit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow unit-test
+
+    '
   container:
     from: src
 - as: sonar-pre-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     export DEPLOYED_IN_HUB=true
+
     export SONAR_GO_TEST_ARGS="./... -coverpkg=./..."
+
     make -f Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   secrets:
   - mount_path: /etc/sonarcloud/
     name: acm-sonarcloud-token
 - as: sonar-post-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     export DEPLOYED_IN_HUB=true
+
     export SONAR_GO_TEST_ARGS="./... -coverpkg=./..."
+
     make -f Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   postsubmit: true

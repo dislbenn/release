@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.24-linux:
     name: builder
     namespace: stolostron
@@ -19,18 +19,18 @@ images:
   to: submariner-addon
 promotion:
   to:
-  - disabled: true
-    name: "2.16"
+  - disabled: false
+    name: '2.16'
     namespace: stolostron
 releases:
   initial:
     integration:
-      name: "4.6"
+      name: '4.6'
       namespace: ocp
   latest:
     integration:
       include_built_images: true
-      name: "4.6"
+      name: '4.6'
       namespace: ocp
 resources:
   '*':
@@ -42,18 +42,21 @@ resources:
 test_binary_build_commands: make build GO_BUILD_FLAGS:='-race' --warn-undefined-variables
 tests:
 - as: build
-  commands: |
-    true
+  commands: 'true
+
+    '
   container:
     from: bin
 - as: verify
-  commands: |
-    make verify -k --warn-undefined-variables
+  commands: 'make verify -k --warn-undefined-variables
+
+    '
   container:
     from: bin
 - as: unit
-  commands: |
-    make test --warn-undefined-variables
+  commands: 'make test --warn-undefined-variables
+
+    '
   container:
     from: test-bin
 - as: integration
@@ -64,11 +67,13 @@ tests:
   steps:
     test:
     - as: test
-      commands: |
-        export SELF="make -f /opt/build-harness/Makefile.prow"
+      commands: 'export SELF="make -f /opt/build-harness/Makefile.prow"
+
         make -f /opt/build-harness/Makefile.prow sonar/go/prow
+
+        '
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/sonarcloud/
         name: acm-sonarcloud-token
         namespace: test-credentials
@@ -86,13 +91,15 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export OSCI_PUBLISH_DELAY="0"
+      commands: 'export OSCI_PUBLISH_DELAY="0"
+
         export OSCI_COMPONENT_NAME="submariner-addon"
+
         export SELF="make -f Makefile.prow"
-        make -f Makefile.prow osci/publish
+
+        make -f Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

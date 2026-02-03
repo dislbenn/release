@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.24-linux:
     name: builder
     namespace: stolostron
@@ -22,8 +22,8 @@ images:
   to: multicloud-integrations
 promotion:
   to:
-  - disabled: true
-    name: "2.16"
+  - disabled: false
+    name: '2.16'
     namespace: stolostron
 resources:
   '*':
@@ -32,31 +32,46 @@ resources:
       memory: 200Mi
 tests:
 - as: test-unit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow lint
+
     make -f Makefile.prow test
+
+    '
   container:
     from: src
 - as: sonarcloud
-  commands: |
-    export SONAR_GO_TEST_ARGS="$(go list ./... | awk '!/e2e/ {printf $0" "}')"
+  commands: 'export SONAR_GO_TEST_ARGS="$(go list ./... | awk ''!/e2e/ {printf $0"
+    "}'')"
+
     export SELF="make -f /opt/build-harness/Makefile.prow"
+
     export HOME="/tmp"
+
     export XDG_CACHE_HOME="/tmp/.cache"
+
     make -f /opt/build-harness/Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   secrets:
   - mount_path: /etc/sonarcloud/
     name: acm-sonarcloud-token
 - as: sonar-post-submit
-  commands: |
-    export SONAR_GO_TEST_ARGS="$(go list ./... | awk '!/e2e/ {printf $0" "}')"
+  commands: 'export SONAR_GO_TEST_ARGS="$(go list ./... | awk ''!/e2e/ {printf $0"
+    "}'')"
+
     export SELF="make -f /opt/build-harness/Makefile.prow"
+
     export HOME="/tmp"
+
     export XDG_CACHE_HOME="/tmp/.cache"
+
     make -f /opt/build-harness/Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   postsubmit: true
@@ -78,12 +93,13 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export OSCI_PUBLISH_DELAY="0"
+      commands: 'export OSCI_PUBLISH_DELAY="0"
+
         export SELF="make -f Makefile.prow"
-        make -f Makefile.prow osci/publish
+
+        make -f Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

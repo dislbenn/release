@@ -11,8 +11,9 @@ images:
   to: console-mce
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.16'
     namespace: stolostron
+    disabled: false
 resources:
   '*':
     requests:
@@ -20,31 +21,44 @@ resources:
       memory: 2Gi
 tests:
 - as: check
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow check
+
+    '
   container:
     from: src
 - as: unit-tests-sonarcloud
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow sonar/js/jest-init
+
     make -f Makefile.prow unit-tests
+
     make -f Makefile.prow sonar/js/prow
+
+    '
   container:
     from: src
   secrets:
   - mount_path: /etc/sonarcloud/
     name: acm-sonarcloud-token
 - as: sonar-post-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow sonar/js/jest-init
+
     make -f Makefile.prow unit-tests
+
     make -f Makefile.prow sonar/js/prow
+
+    '
   container:
     from: src
   postsubmit: true
@@ -84,14 +98,17 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export OSCI_COMPONENT_NAME=console
+      commands: 'export OSCI_COMPONENT_NAME=console
+
         export OSCI_COMPONENT_VERSION=2.16.0
+
         export OSCI_PUBLISH_DELAY="0"
+
         export SELF="make -f Makefile.prow"
-        make -f Makefile.prow osci/publish
+
+        make -f Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

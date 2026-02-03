@@ -17,8 +17,8 @@ images:
   to: observatorium-operator
 promotion:
   to:
-  - disabled: true
-    name: "2.16"
+  - disabled: false
+    name: '2.16'
     namespace: stolostron
 resources:
   '*':
@@ -27,7 +27,7 @@ resources:
     requests:
       cpu: 100m
       memory: 1Gi
-test_binary_build_commands: "true"
+test_binary_build_commands: 'true'
 tests:
 - as: pr-image-mirror
   steps:
@@ -50,9 +50,11 @@ tests:
     - ref: ocm-e2e-kind-create
     test:
     - as: test
-      commands: |
-        echo "OPERATOR_IMAGE_NAME=$OPERATOR_IMAGE_NAME"
+      commands: 'echo "OPERATOR_IMAGE_NAME=$OPERATOR_IMAGE_NAME"
+
         ./tests/e2e.sh test-kind-prow
+
+        '
       dependencies:
       - env: OPERATOR_IMAGE_NAME
         name: observatorium-operator
@@ -72,13 +74,15 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export SELF="make -f /opt/build-harness/Makefile.prow"
+      commands: 'export SELF="make -f /opt/build-harness/Makefile.prow"
+
         export OSCI_PUBLISH_DELAY="0"
+
         export OSCI_COMPONENT_NAME="observatorium-operator"
-        make -f /opt/build-harness/Makefile.prow osci/publish
+
+        make -f /opt/build-harness/Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

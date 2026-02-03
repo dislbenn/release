@@ -17,8 +17,8 @@ images:
   to: volsync-addon-controller
 promotion:
   to:
-  - disabled: true
-    name: "2.16"
+  - disabled: false
+    name: '2.16'
     namespace: stolostron
 resources:
   '*':
@@ -27,27 +27,36 @@ resources:
       memory: 200Mi
 tests:
 - as: unit
-  commands: |
-    export SELF="make -f Makefile"
+  commands: 'export SELF="make -f Makefile"
+
     export HOME="/tmp"
+
     make -f Makefile test
+
+    '
   container:
     from: src
 - as: sonar-pre-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     export HOME="/tmp"
+
     make -f Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   secrets:
   - mount_path: /etc/sonarcloud/
     name: acm-sonarcloud-token
 - as: sonar-post-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     export HOME="/tmp"
+
     make -f Makefile.prow sonar/go/prow
+
+    '
   container:
     from: src
   postsubmit: true
@@ -64,14 +73,17 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export SELF="make -f Makefile.prow"
+      commands: 'export SELF="make -f Makefile.prow"
+
         export OSCI_PUBLISH_DELAY="0"
+
         export OSCI_COMPONENT_NAME="volsync-addon-controller"
+
         export OSCI_COMPONENT_VERSION="2.16.0"
-        make -f Makefile.prow osci/publish
+
+        make -f Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

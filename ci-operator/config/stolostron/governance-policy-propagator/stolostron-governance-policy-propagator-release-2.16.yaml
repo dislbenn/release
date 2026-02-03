@@ -2,7 +2,7 @@ base_images:
   base:
     name: ubi-minimal
     namespace: ocp
-    tag: "9"
+    tag: '9'
   stolostron_builder_go1.25-linux:
     name: builder
     namespace: stolostron
@@ -23,8 +23,9 @@ images:
   to: governance-policy-propagator
 promotion:
   to:
-  - name: "2.16"
+  - name: '2.16'
     namespace: stolostron
+    disabled: false
 resources:
   '*':
     requests:
@@ -41,12 +42,13 @@ tests:
       REGISTRY_ORG: stolostron
     test:
     - as: publish
-      commands: |-
-        export OSCI_PUBLISH_DELAY="0"
+      commands: 'export OSCI_PUBLISH_DELAY="0"
+
         export SELF="make -f Makefile.prow"
-        make -f Makefile.prow osci/publish
+
+        make -f Makefile.prow osci/publish'
       credentials:
-      - collection: ""
+      - collection: ''
         mount_path: /etc/github
         name: acm-cicd-github
         namespace: test-credentials

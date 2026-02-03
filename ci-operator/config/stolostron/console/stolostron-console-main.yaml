@@ -16,19 +16,27 @@ resources:
       memory: 2Gi
 tests:
 - as: check
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow check
+
+    '
   container:
     from: src
 - as: unit-tests-sonarcloud
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow sonar/js/jest-init
+
     make -f Makefile.prow unit-tests
+
     make -f Makefile.prow sonar/js/prow
+
+    '
   container:
     from: src
   secrets:
@@ -49,12 +57,17 @@ tests:
       IMAGE_REPO: console-mce
     workflow: ocm-ci-image-mirror
 - as: sonar-post-submit
-  commands: |
-    export SELF="make -f Makefile.prow"
+  commands: 'export SELF="make -f Makefile.prow"
+
     make -f Makefile.prow install
+
     make -f Makefile.prow sonar/js/jest-init
+
     make -f Makefile.prow unit-tests
+
     make -f Makefile.prow sonar/js/prow
+
+    '
   container:
     from: src
   postsubmit: true
@@ -83,7 +96,7 @@ tests:
   postsubmit: true
   steps:
     env:
-      DESTINATION_BRANCH: release-2.16
+      DESTINATION_BRANCH: release-2.17
     workflow: ocm-ci-fastforward
 zz_generated_metadata:
   branch: main
