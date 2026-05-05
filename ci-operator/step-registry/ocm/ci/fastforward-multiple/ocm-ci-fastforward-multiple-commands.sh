@@ -542,7 +542,50 @@ create_tekton_files() {
 
     cd "$repo" || exit 1
 
-    # Find highest existing version (returns "0" if no .tekton directory)
+    # Create branch for PR
+    local pr_branch="add-tekton-files-${dest_versions// /-}"
+
+    # Check if PR branch already exists on remote BEFORE doing any file operations
+    local branch_existed_on_remote=false
+    log "INFO Checking if PR branch ${pr_branch} exists on remote"
+    if git ls-remote --heads origin "${pr_branch}" | grep -q "${pr_branch}"; then
+      branch_existed_on_remote=true
+      log "INFO PR branch ${pr_branch} already exists on remote"
+      log "INFO Fetching and checking out existing branch"
+      if ! git fetch origin "${pr_branch}" 2>&1; then
+        log "ERROR Could not fetch ${pr_branch}"
+        exit 1
+      fi
+      if ! git checkout "${pr_branch}" 2>&1; then
+        log "ERROR Could not checkout ${pr_branch}"
+        exit 1
+      fi
+
+      # Check if HEAD commit has DCO sign-off, amend if missing
+      log "INFO Checking DCO sign-off on existing commit"
+      if ! git log -1 --pretty=%B | grep -q "^Signed-off-by:"; then
+        log "INFO Missing DCO sign-off, amending commit"
+        git config user.name "OpenShift CI Robot"
+        git config user.email "noreply@openshift.io"
+        if ! git commit --amend -s --no-edit 2>&1; then
+          log "WARNING Could not amend commit with DCO"
+        else
+          log "INFO Force pushing amended commit"
+          if ! git push --force 2>&1; then
+            log "WARNING Could not force push amended commit"
+          fi
+        fi
+      fi
+    else
+      log "INFO Creating new PR branch ${pr_branch}"
+      if ! git checkout -b "${pr_branch}" 2>&1; then
+        log "ERROR Could not create branch ${pr_branch}"
+        exit 1
+      fi
+    fi
+
+    # Now that we're on the correct branch (either existing PR or new branch),
+    # find highest existing version (returns "0" if no .tekton directory)
     local highest_version
     highest_version=$(get_highest_tekton_version "." "${product_prefix}" "${branch_prefix}")
 
@@ -622,48 +665,6 @@ create_tekton_files() {
       fi
 
       log "INFO Source version: ${branch_prefix}-${source_version}"
-    fi
-
-    # Create branch for PR
-    local pr_branch="add-tekton-files-${dest_versions// /-}"
-
-    # Check if PR branch already exists on remote
-    local branch_existed_on_remote=false
-    log "INFO Checking if PR branch ${pr_branch} exists on remote"
-    if git ls-remote --heads origin "${pr_branch}" | grep -q "${pr_branch}"; then
-      branch_existed_on_remote=true
-      log "INFO PR branch ${pr_branch} already exists on remote"
-      log "INFO Fetching and checking out existing branch"
-      if ! git fetch origin "${pr_branch}" 2>&1; then
-        log "ERROR Could not fetch ${pr_branch}"
-        exit 1
-      fi
-      if ! git checkout "${pr_branch}" 2>&1; then
-        log "ERROR Could not checkout ${pr_branch}"
-        exit 1
-      fi
-
-      # Check if HEAD commit has DCO sign-off, amend if missing
-      log "INFO Checking DCO sign-off on existing commit"
-      if ! git log -1 --pretty=%B | grep -q "^Signed-off-by:"; then
-        log "INFO Missing DCO sign-off, amending commit"
-        git config user.name "OpenShift CI Robot"
-        git config user.email "noreply@openshift.io"
-        if ! git commit --amend -s --no-edit 2>&1; then
-          log "WARNING Could not amend commit with DCO"
-        else
-          log "INFO Force pushing amended commit"
-          if ! git push --force 2>&1; then
-            log "WARNING Could not force push amended commit"
-          fi
-        fi
-      fi
-    else
-      log "INFO Creating new PR branch ${pr_branch}"
-      if ! git checkout -b "${pr_branch}" 2>&1; then
-        log "ERROR Could not create branch ${pr_branch}"
-        exit 1
-      fi
     fi
 
     local files_created=false
