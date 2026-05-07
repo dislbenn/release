@@ -6,9 +6,10 @@ shopt -s extglob
 exit_code=0
 
 # Track failures for summary report
-declare -a FAILED_FASTFORWARDS
-declare -a FAILED_TEKTON
-declare -a SKIPPED_NO_ACCESS
+FAILED_FASTFORWARDS=()
+FAILED_TEKTON=()
+SKIPPED_NO_ACCESS=()
+CLEANED_BRANCHES=()
 TOTAL_FASTFORWARDS=0
 SUCCESSFUL_FASTFORWARDS=0
 TOTAL_TEKTON=0
@@ -1442,7 +1443,7 @@ echo ""
 echo "Repositories:"
 echo "  Total:        ${TOTAL_REPOS}"
 echo "  Processed:    ${PROCESSED_REPOS}"
-echo "  Skipped:      ${#SKIPPED_NO_ACCESS[@]:-0}"
+echo "  Skipped:      ${#SKIPPED_NO_ACCESS[@]}"
 echo ""
 
 # Fast-forward summary
@@ -1465,7 +1466,7 @@ echo "  Stale ff-* branches deleted: ${TOTAL_CLEANED}"
 echo ""
 
 # List skipped repos
-if [[ ${#SKIPPED_NO_ACCESS[@]:-0} -gt 0 ]]; then
+if [[ ${#SKIPPED_NO_ACCESS[@]} -gt 0 ]]; then
   echo "Skipped Repositories (No Write Access):"
   for repo in "${SKIPPED_NO_ACCESS[@]+"${SKIPPED_NO_ACCESS[@]}"}"; do
     echo "  - ${repo}"
@@ -1474,7 +1475,7 @@ if [[ ${#SKIPPED_NO_ACCESS[@]:-0} -gt 0 ]]; then
 fi
 
 # List failures if any
-if [[ ${#FAILED_FASTFORWARDS[@]:-0} -gt 0 ]]; then
+if [[ ${#FAILED_FASTFORWARDS[@]} -gt 0 ]]; then
   echo "Failed Fast-Forward Operations:"
   for failure in "${FAILED_FASTFORWARDS[@]+"${FAILED_FASTFORWARDS[@]}"}"; do
     echo "  - ${failure}"
@@ -1482,7 +1483,7 @@ if [[ ${#FAILED_FASTFORWARDS[@]:-0} -gt 0 ]]; then
   echo ""
 fi
 
-if [[ ${#FAILED_TEKTON[@]:-0} -gt 0 ]]; then
+if [[ ${#FAILED_TEKTON[@]} -gt 0 ]]; then
   echo "Failed Tekton File Creations:"
   for failure in "${FAILED_TEKTON[@]+"${FAILED_TEKTON[@]}"}"; do
     echo "  - ${failure}"
@@ -1491,7 +1492,7 @@ if [[ ${#FAILED_TEKTON[@]:-0} -gt 0 ]]; then
 fi
 
 # List cleaned branches
-if [[ ${#CLEANED_BRANCHES[@]:-0} -gt 0 ]]; then
+if [[ ${#CLEANED_BRANCHES[@]} -gt 0 ]]; then
   echo "Cleaned Stale Branches:"
   for cleaned in "${CLEANED_BRANCHES[@]+"${CLEANED_BRANCHES[@]}"}"; do
     echo "  - ${cleaned}"
